@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AL-MAJID ELECTRONICS - Smart Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent: #38bdf8;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --glass-card: rgba(30, 41, 59, 0.85);
+      --glass-box: #1e293b;
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+    }
+
+    * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    body { 
+      margin: 0; 
+      padding: 30px 15px; 
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text-main);
+      transition: background 0.3s ease;
+    }
+
+    body.login-active {
+      background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.90)), 
+                  url('https://lh3.googleusercontent.com/d/1P9zOIsxfWA5cMqTpNJaTJw6bc-PpfYwg') no-repeat center center fixed !important;
+      background-size: cover !important;
+      background-color: #0f172a !important;
+    }
+
+    .container { 
+      max-width: 1100px; 
+      margin: auto; 
+      background: var(--glass-card); 
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 35px; 
+      border-radius: 24px; 
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5); 
+      border: 1px solid var(--glass-border);
+    }
+
+    .hero-brand { text-align: center; margin-bottom: 30px; }
+    .main-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      margin: 0;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+    .brand-subtitle {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    h2, h3 {
+      color: #f1f5f9;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 { font-size: 20px; margin-top: 30px; margin-bottom: 15px; }
+    h3 { font-size: 16px; margin: 0 0 15px 0; }
+
+    input[type="text"], input[type="password"], input[type="date"], input[type="time"], input[type="number"], select { 
+      padding: 10px 14px; 
+      margin: 4px; 
+      border: 1px solid #334155; 
+      border-radius: 10px; 
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s ease;
+      background: #0f172a;
+      color: #f8fafc;
+    }
+    option { background-color: #0f172a; color: #f8fafc; }
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+      background: #090d16;
+    }
+
+    button { 
+      padding: 10px 18px; 
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); 
+      color: white; 
+      border: none; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px var(--primary-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px var(--primary-glow);
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    button.danger { 
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); 
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+    button.success { 
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+    button.warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    #saveAttendanceBtn {
+      font-size: 15px;
+      padding: 12px;
+      width: 100%;
+      margin-top: 15px;
+      justify-content: center;
+    }
+
+    .shift-banner { 
+      background: rgba(56, 189, 248, 0.08); 
+      color: #7dd3fc; 
+      padding: 14px 20px; 
+      border-radius: 14px; 
+      margin-bottom: 20px; 
+      font-weight: 500; 
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .branch-section { 
+      background: var(--glass-box); 
+      padding: 16px 20px; 
+      border-radius: 16px; 
+      margin-bottom: 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--card-shadow);
+    }
+
+    .admin-badge { 
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
+      color: white; 
+      padding: 3px 8px; 
+      border-radius: 6px; 
+      font-size: 10px; 
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+
+    .card-box { 
+      background: var(--glass-box); 
+      border: 1px solid var(--glass-border); 
+      padding: 20px; 
+      border-radius: 16px; 
+      margin-bottom: 20px; 
+      box-shadow: var(--card-shadow);
+    }
+
+    .table-container { 
+      overflow-x: auto; 
+      border-radius: 14px; 
+      border: 1px solid var(--glass-border); 
+      box-shadow: var(--card-shadow);
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: #0f172a;
+    }
+    th, td { 
+      padding: 12px 14px; 
+      text-align: center; 
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13.5px;
+      color: #cbd5e1;
+    }
+    th { 
+      background: rgba(30, 41, 59, 0.9); 
+      color: #93c5fd; 
+      font-weight: 700; 
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    tbody tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+
+    #loginBox { 
+      max-width: 380px; 
+      margin: 80px auto; 
+      background: rgba(15, 23, 42, 0.9); 
+      backdrop-filter: blur(25px); 
+      -webkit-backdrop-filter: blur(25px);
+      padding: 35px; 
+      border-radius: 24px; 
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); 
+      border: 1px solid var(--glass-border);
+      text-align: center;
+      color: #f8fafc;
+    }
+    #loginBox input { 
+      width: 100%; 
+      padding: 12px; 
+      margin: 8px 0; 
+      background: rgba(0, 0, 0, 0.3); 
+      border: 1px solid var(--glass-border); 
+      color: #fff; 
+    }
+    #loginBox input:focus { border-color: var(--primary); background: rgba(0, 0, 0, 0.5); }
+    #loginBox h3 { color: #ffffff; }
+    #loginBtn { width: 100%; padding: 12px; margin-top: 12px; justify-content: center; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="login-active">
+
+<!-- LOGIN INTERFACE -->
+<div id="loginBox">
+  <div class="hero-brand">
+    <h1 class="main-title" style="font-size: 20px;">AL-MAJID</h1>
+    <div class="brand-subtitle">ELECTRONICS</div>
+  </div>
+  <h3 style="justify-content: center; margin-bottom: 15px;"><i class="fa-solid fa-lock"></i> Portal Sign In</h3>
+  <input type="text" id="username" placeholder="Username (e.g. admin or m1)">
+  <input type="password" id="password" placeholder="Password">
+  <button id="loginBtn" onclick="login()"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+</div>
+
+<!-- DASHBOARD APPLICATION -->
+<div class="container" id="appContainer" style="display: none;">
+  
+  <div class="hero-brand">
+    <h1 class="main-title">AL-MAJID ELECTRONICS</h1>
+    <div class="brand-subtitle">Management Dashboard</div>
+  </div>
+
+  <div class="branch-section">
+    <div>
+      <span style="color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">CURRENT ACCOUNT</span><br>
+      <strong id="currentBranchDisplay" style="color: #fff; font-size: 16px;"></strong>
+      <span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <span id="adminBranchSelectContainer" style="display: none;">
+        <select id="adminBranchSelect" onchange="switchBranchAdmin(this.value)">
+          <option value="M1">Branch M1</option>
+          <option value="M2">Branch M2</option>
+          <option value="M3">Branch M3</option>
+        </select>
+      </span>
+      <button class="danger" onclick="logout()"><i class="fa-solid fa-power-off"></i> Logout</button>
+    </div>
+  </div>
+
+  <div id="adminControls" class="card-box" style="display: none;">
+    <h3 style="color:#fbbf24;"><i class="fa-solid fa-key"></i> Security Settings</h3>
+    <select id="targetUserSelect">
+      <option value="admin">Admin Account</option>
+      <option value="m1">Branch M1</option>
+      <option value="m2">Branch M2</option>
+      <option value="m3">Branch M3</option>
+    </select>
+    <input type="password" id="newPasswordInput" placeholder="New Password">
+    <button class="success" onclick="changeUserPassword()"><i class="fa-solid fa-shield-halved"></i> Update Password</button>
+  </div>
+
+  <div class="shift-banner">
+    <i class="fa-solid fa-clock" style="color: var(--accent);"></i> 
+    <span>Shift Start: <strong>10:00 AM</strong> | On-Time Cutoff: <strong>10:10 AM</strong> | Late Fine (10:11-10:30): <strong>PKR 500</strong> | After 10:30 AM: <strong>Absent (Rs.0 Fine)</strong></span>
+  </div>
+
+  <div id="addEmployeeSection" class="card-box" style="display: none;">
+    <h3><i class="fa-solid fa-user-plus"></i> Add New Employee</h3>
+    <input type="text" id="employeeName" placeholder="Employee Full Name">
+    <button class="success" onclick="addEmployee()"><i class="fa-solid fa-plus"></i> Add Staff</button>
+  </div>
+
+  <h2><i class="fa-solid fa-calendar-check"></i> Today's Attendance Sheet</h2>
+  <input type="hidden" id="attendanceDate">
+
+  <div class="table-container">
+    <table id="attendanceTable">
+      <thead>
+        <tr>
+          <th>Employee Name</th>
+          <th>Status</th>
+          <th>Time In</th>
+          <th>Late Hours</th>
+          <th>Fine (PKR)</th>
+          <th class="admin-only">Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <button id="saveAttendanceBtn" onclick="saveAttendance()"><i class="fa-solid fa-floppy-disk"></i> Save Attendance Record</button>
+
+  <div id="adminEditSection" class="card-box" style="display: none; margin-top: 30px;">
+    <h3 style="color:#34d399;"><i class="fa-solid fa-pen-to-square"></i> Modify Past Logs</h3>
+    <label style="font-size: 12px; color: var(--text-muted);">Select Target Date:</label><br>
+    <input type="date" id="editDateSelect">
+    <button onclick="loadRecordForEdit()"><i class="fa-solid fa-magnifying-glass"></i> Load Logs</button>
+    
+    <div id="editArea" style="display: none; margin-top: 15px;">
+      <div class="table-container">
+        <table id="editAttendanceTable">
+          <thead>
+            <tr>
+              <th>Employee Name</th>
+              <th>Status</th>
+              <th>Time In</th>
+              <th>Late Hours</th>
+              <th>Fine (PKR)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <br>
+      <button class="success" onclick="updateAttendanceRecord()"><i class="fa-solid fa-circle-check"></i> Confirm Updates</button>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE REPORT SECTION -->
+  <div style="margin-top: 40px;" class="card-box">
+    <h2><i class="fa-solid fa-file-lines"></i> Attendance Report</h2>
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+      <div>
+        <label style="font-size: 12px; color: var(--text-muted);">Report Date:</label><br>
+        <input type="date" id="reportDateSelect">
+      </div>
+      <div style="align-self: flex-end;">
+        <button onclick="loadAttendanceReport()"><i class="fa-solid fa-magnifying-glass"></i> Load Report</button>
+      </div>
+      <div style="align-self: flex-end; margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="success" onclick="downloadCSV()"><i class="fa-solid fa-file-csv"></i> Export CSV</button>
+        <button class="warning" onclick="printReportPreview()"><i class="fa-solid fa-print"></i> Print Preview</button>
+        <button class="danger" onclick="downloadPDF()"><i class="fa-solid fa-file-pdf"></i> Export PDF (Landscape)</button>
+      </div>
+    </div>
+    <div id="recordsDisplay">
+      <p style="color: var(--text-muted); text-align: center; padding: 20px;">Report dekhne ke liye date select karke 'Load Report' par click karein.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const OFFICE_TIME = "10:00"; 
+  const ON_TIME_CUTOFF = "10:10";
+  const ABSENT_CUTOFF = "10:30";
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwA1sa8AoUQxl4L2fc7oe6_FIF_YZvn07EccpnMx5-FfR9YQ1PVySVTSgUR9vHUKWf_/exec";
+
+  async function fetchWithRetry(url, options = {}, retries = 2) {
+    for (let i = 0; i <= retries; i++) {
+      try {
+        let response = await fetch(url, options);
+        if (!response.ok) throw new Error("Server error");
+        return await response.json();
+      } catch (err) {
+        if (i === retries) throw err;
+        await new Promise(res => setTimeout(res, 1000));
+      }
+    }
+  }
+
+  function login() {
+    let userVal = document.getElementById("username").value.trim();
+    let passVal = document.getElementById("password").value.trim();
+    if (!userVal || !passVal) return alert("یوزر نیم اور پاسورڈ درج کریں!");
+
+    let loginBtn = document.getElementById("loginBtn");
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Logging in...`;
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "login", username: userVal, password: passVal })
+    })
+    .then(res => res.json())
+    .then(data => {
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login`;
+      if (data.status === "success") {
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        localStorage.setItem("selectedBranch", data.user.branch);
+        initApp();
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch(() => {
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login`;
+      alert("Login Request Failed! Server Not Responding.");
+    });
+  }
+
+  function logout() {
+    localStorage.clear();
+    location.reload();
+  }
+
+  function getCurrentUser() { 
+    try { return JSON.parse(localStorage.getItem("currentUser")); } catch(e) { return null; }
+  }
+  function getSelectedBranch() { return localStorage.getItem("selectedBranch") || "M1"; }
+
+  function switchBranchAdmin(branch) {
+    localStorage.setItem("selectedBranch", branch);
+    initApp();
+  }
+
+  function changeUserPassword() {
+    let targetUser = document.getElementById("targetUserSelect").value;
+    let newPassword = document.getElementById("newPasswordInput").value.trim();
+    if (!newPassword) return alert("نیا پاسورڈ لکھیں!");
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "changePassword", targetUser: targetUser, newPassword: newPassword })
+    })
+    .then(res => res.json())
+    .then(data => alert(data.message));
+  }
+
+  async function initApp() {
+    let user = getCurrentUser();
+    if (!user) return;
+
+    document.body.classList.remove("login-active");
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("appContainer").style.display = "block";
+    
+    let today = new Date();
+    let year = today.getFullYear();
+    let month = String(today.getMonth() + 1).padStart(2, '0');
+    let day = String(today.getDate()).padStart(2, '0');
+    let todayStr = `${year}-${month}-${day}`;
+    
+    document.getElementById("attendanceDate").value = todayStr;
+    document.getElementById("editDateSelect").value = todayStr;
+    document.getElementById("reportDateSelect").value = todayStr;
+
+    if (user.role === "ADMIN") {
+      document.getElementById("currentBranchDisplay").innerText = "Admin Panel";
+      document.getElementById("adminBadge").style.display = "inline";
+      document.getElementById("adminBranchSelectContainer").style.display = "inline";
+      document.getElementById("adminControls").style.display = "block";
+      document.getElementById("addEmployeeSection").style.display = "block";
+      document.getElementById("adminEditSection").style.display = "block";
+      document.getElementById("adminBranchSelect").value = getSelectedBranch();
+    } else {
+      document.getElementById("currentBranchDisplay").innerText = "Branch " + user.branch;
+    }
+
+    await fetchAndLoadEmployees();
+    await checkAlreadySubmitted();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => { if (getCurrentUser()) initApp(); });
+
+  async function fetchAndLoadEmployees() {
+    let branch = getSelectedBranch();
+    let tbody = document.getElementById("attendanceTable").getElementsByTagName('tbody')[0];
+    tbody.innerHTML = "<tr><td colspan='6' style='color: var(--text-muted);'><i class='fa-solid fa-spinner fa-spin'></i> Data load ho raha hai, bara-e-karam intezar karein...</td></tr>";
+
+    try {
+      let data = await fetchWithRetry(WEB_APP_URL);
+      tbody.innerHTML = "";
+      let employees = data[branch] || [];
+      if (employees.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='6' style='color: var(--text-muted);'>No staff found for this branch.</td></tr>";
+        return;
+      }
+
+      let today = document.getElementById("attendanceDate").value;
+      let savedRecords = [];
+      try {
+        savedRecords = await fetchWithRetry(`${WEB_APP_URL}?action=getRecord&branch=${branch}&date=${today}`);
+      } catch(e) {
+        console.log("Could not fetch today's record");
+      }
+
+      employees.forEach(name => {
+        let existingRecord = savedRecords ? savedRecords.find(r => r.name === name) : null;
+        renderEmployee(name, existingRecord);
+      });
+    } catch (err) {
+      tbody.innerHTML = "<tr><td colspan='6' style='color: var(--danger);'>سرور مصروف ہے یا جواب نہیں دے رہا۔ براہ کرم ریفرش کریں۔</td></tr>";
+    }
+  }
+
+  function addEmployee() {
+    let branch = getSelectedBranch();
+    let name = document.getElementById("employeeName").value.trim();
+    if (!name) return alert("نام درج کریں!");
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "addEmployee", branch: branch, name: name })
+    }).then(() => {
+      alert("ایمپلائی شامل ہو گیا!");
+      document.getElementById("employeeName").value = "";
+      fetchAndLoadEmployees();
+    });
+  }
+
+  function deleteEmployee(name) {
+    let branch = getSelectedBranch();
+    if (!confirm(`کیا آپ واقعی ${name} کو ڈیلیٹ کرنا چاہتے ہیں؟`)) return;
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "deleteEmployee", branch: branch, name: name })
+    }).then(() => {
+      alert("ایمپلائی ڈیلیٹ ہو گیا!");
+      fetchAndLoadEmployees();
+    });
+  }
+
+  function renderEmployee(name, savedRecord) {
+    let user = getCurrentUser();
+    let tbody = document.getElementById("attendanceTable").getElementsByTagName('tbody')[0];
+    let row = tbody.insertRow();
+    row.setAttribute("data-employee", name);
+
+    let defaultStatus = savedRecord ? savedRecord.status : "Present";
+    let defaultTime = savedRecord && savedRecord.timeIn !== "-" ? savedRecord.timeIn : "";
+    let defaultLate = savedRecord ? savedRecord.lateHours : "0";
+    let defaultFine = savedRecord ? savedRecord.fine : "0";
+    let isAlreadyCheckedIn = savedRecord && savedRecord.timeIn && savedRecord.timeIn !== "-";
+
+    row.insertCell(0).innerText = name;
+    row.insertCell(1).innerHTML = `<select class="status-select" onchange="manualStatusChange(this)" ${isAlreadyCheckedIn && user.role !== 'ADMIN' ? 'disabled' : ''}>
+                                        <option value="Present" ${defaultStatus === 'Present' ? 'selected' : ''}>Present</option>
+                                        <option value="Absent" ${defaultStatus === 'Absent' ? 'selected' : ''}>Absent</option>
+                                        <option value="Leave" ${defaultStatus === 'Leave' ? 'selected' : ''}>Leave</option>
+                                   </select>`;
+    
+    if (user && user.role === "ADMIN") {
+      row.insertCell(2).innerHTML = `<input type="time" class="timeIn" value="${defaultTime}" onchange="processAttendanceLogic(this)">`;
+    } else {
+      let checkInBtnText = isAlreadyCheckedIn ? `<i class="fa-solid fa-check"></i> Checked In` : `<i class="fa-solid fa-clock"></i> Check In`;
+      let checkInBtnDisabled = isAlreadyCheckedIn ? `disabled style="background: #334155;"` : ``;
+      row.insertCell(2).innerHTML = `<input type="time" class="timeIn" value="${defaultTime}" readonly style="opacity:0.6;"> <button class="checkInBtn" onclick="markCurrentTime(this)" ${checkInBtnDisabled}>${checkInBtnText}</button>`;
+    }
+
+    row.insertCell(3).innerHTML = `<input type="number" class="lateHours" value="${defaultLate}" readonly style="width:60px; opacity:0.6;">`;
+    row.insertCell(4).innerHTML = `<input type="number" class="fineAmount" value="${defaultFine}" readonly style="width:75px; opacity:0.6;">`;
+
+    if (user && user.role === "ADMIN") {
+      row.insertCell(5).innerHTML = `<button class="danger" onclick="deleteEmployee('${name}')"><i class="fa-solid fa-trash"></i></button>`;
+    } else {
+      row.insertCell(5).innerText = "-";
+    }
+
+    if (defaultTime) {
+      let timeInput = row.querySelector('.timeIn');
+      processAttendanceLogic(timeInput);
+    }
+  }
+
+  function markCurrentTime(btnElem) {
+    let row = btnElem.closest('tr');
+    let timeInput = row.querySelector('.timeIn');
+    let now = new Date();
+    let currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    timeInput.value = currentTimeStr;
+    processAttendanceLogic(timeInput);
+
+    let branch = getSelectedBranch();
+    let date = document.getElementById("attendanceDate").value;
+    let name = row.getAttribute("data-employee");
+    let status = row.querySelector('.status-select').value;
+    let lateHours = row.querySelector('.lateHours').value || "0";
+    let fine = row.querySelector('.fineAmount').value || "0";
+
+    let singleRecord = [{
+      branch: branch,
+      date: date,
+      name: name,
+      status: status,
+      timeIn: currentTimeStr,
+      lateHours: lateHours,
+      fine: fine
+    }];
+
+    btnElem.disabled = true;
+    btnElem.style.background = "#334155";
+    btnElem.innerHTML = `<i class="fa-solid fa-check"></i> Checked In`;
+    row.querySelector('.status-select').disabled = true;
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "saveAttendance", records: singleRecord })
+    })
+    .catch(err => { console.error("Error:", err); });
+  }
+
+  function processAttendanceLogic(timeInput) {
+    let row = timeInput.closest('tr');
+    let statusSelect = row.querySelector('.status-select');
+    let lateInput = row.querySelector('.lateHours');
+    let fineInput = row.querySelector('.fineAmount');
+
+    if (!timeInput.value) {
+      lateInput.value = 0;
+      fineInput.value = 0;
+      return;
+    }
+
+    let [h, m] = timeInput.value.split(':').map(Number);
+    let timeMin = h * 60 + m;
+
+    let [oh, om] = OFFICE_TIME.split(':').map(Number);
+    let officeMin = oh * 60 + om;
+
+    let [onh, onm] = ON_TIME_CUTOFF.split(':').map(Number);
+    let onTimeMin = onh * 60 + onm;
+
+    let [ah, am] = ABSENT_CUTOFF.split(':').map(Number);
+    let absentMin = ah * 60 + am;
+
+    if (timeMin <= onTimeMin) {
+      statusSelect.value = "Present";
+      lateInput.value = 0;
+      fineInput.value = 0;
+    } 
+    else if (timeMin > onTimeMin && timeMin <= absentMin) {
+      statusSelect.value = "Present";
+      lateInput.value = ((timeMin - officeMin) / 60).toFixed(1);
+      fineInput.value = 500;
+    } 
+    else if (timeMin > absentMin) {
+      statusSelect.value = "Absent";
+      lateInput.value = 0;
+      fineInput.value = 0;
+    }
+  }
+
+  function manualStatusChange(selectElem) {
+    let row = selectElem.closest('tr');
+    let fineInput = row.querySelector('.fineAmount');
+    let lateInput = row.querySelector('.lateHours');
+    if (selectElem.value === "Absent" || selectElem.value === "Leave") {
+      fineInput.value = 0;
+      lateInput.value = 0;
+    }
+  }
+
+  async function checkAlreadySubmitted() {
+    let date = document.getElementById("attendanceDate").value;
+    let branch = getSelectedBranch();
+    let saveBtn = document.getElementById("saveAttendanceBtn");
+
+    try {
+      let records = await fetchWithRetry(`${WEB_APP_URL}?action=getRecord&branch=${branch}&date=${date}`);
+      if (records && records.length > 0) {
+        saveBtn.disabled = true;
+        saveBtn.style.background = "#334155";
+        saveBtn.innerText = "آج کی حاضری پہلے سے سیو ہے!";
+      } else {
+        saveBtn.disabled = false;
+        saveBtn.style.background = "linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%)";
+        saveBtn.innerText = "Save Attendance Record";
+      }
+    } catch(e) {
+      saveBtn.disabled = false;
+    }
+  }
+
+  function saveAttendance() {
+    let branch = getSelectedBranch();
+    let date = document.getElementById("attendanceDate").value;
+    let rows = document.getElementById("attendanceTable").getElementsByTagName('tbody')[0].rows;
+    let recordsList = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      let nameCell = rows[i].cells[0];
+      if(!nameCell || !rows[i].cells[1].querySelector('select')) continue;
+
+      let name = nameCell.innerText;
+      let status = rows[i].cells[1].querySelector('select').value;
+      let timeInInput = rows[i].cells[2].querySelector('input');
+      let timeIn = timeInInput ? (timeInInput.value || "-") : "-";
+      let lateHours = rows[i].cells[3].querySelector('input').value || "0";
+      let fine = rows[i].cells[4].querySelector('input').value || "0";
+      recordsList.push({ branch, date, name, status, timeIn, lateHours, fine });
+    }
+
+    if(recordsList.length === 0) return alert("سیو کرنے کے لیے کوئی ریکارڈ موجود نہیں!");
+
+    let saveBtn = document.getElementById("saveAttendanceBtn");
+    saveBtn.disabled = true;
+    saveBtn.innerText = "Saving...";
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "saveAttendance", records: recordsList })
+    })
+    .then(res => res.text())
+    .then(() => {
+      alert("آج کی حاضری کامیابی سے سیو ہو گئی!");
+      checkAlreadySubmitted();
+    })
+    .catch(() => {
+      saveBtn.disabled = false;
+      saveBtn.innerText = "Save Attendance Record";
+      alert("Save nahi ho saka, dobara koshish karein.");
+    });
+  }
+
+  function formatTimeString(tStr) {
+    if (!tStr || tStr === "-") return "";
+    let match = tStr.match(/(\d{1,2}):(\d{2})/);
+    return match ? `${match[1].padStart(2, '0')}:${match[2]}` : "";
+  }
+
+  function loadRecordForEdit() {
+    let branch = getSelectedBranch();
+    let date = document.getElementById("editDateSelect").value;
+    if (!date) return alert("تاریخ سلیکٹ کریں!");
+
+    let tbody = document.getElementById("editAttendanceTable").getElementsByTagName('tbody')[0];
+    tbody.innerHTML = "<tr><td colspan='5' style='color: var(--text-muted);'>لوڈ ہو رہا ہے...</td></tr>";
+    document.getElementById("editArea").style.display = "block";
+
+    fetch(`${WEB_APP_URL}?action=getRecord&branch=${branch}&date=${date}`)
+      .then(res => res.json())
+      .then(records => {
+        tbody.innerHTML = "";
+        if (!records || records.length === 0) {
+          alert("اس منتخب تاریخ کا کوئی ریکارڈ نہیں ملا!");
+          document.getElementById("editArea").style.display = "none";
+          return;
+        }
+        records.forEach(rec => {
+          let row = tbody.insertRow();
+          let formattedTime = formatTimeString(rec.timeIn);
+          let formattedLate = rec.lateHours ?? "0";
+          let formattedFine = rec.fine || "0";
+
+          row.insertCell(0).innerText = rec.name;
+          row.insertCell(1).innerHTML = `
+            <select class="status-select" onchange="manualStatusChange(this)">
+              <option value="Present" ${rec.status === 'Present' ? 'selected' : ''}>Present</option>
+              <option value="Absent" ${rec.status === 'Absent' ? 'selected' : ''}>Absent</option>
+              <option value="Leave" ${rec.status === 'Leave' ? 'selected' : ''}>Leave</option>
+            </select>`;
+          row.insertCell(2).innerHTML = `<input type="time" class="edit-time" value="${formattedTime}" onchange="processAttendanceLogic(this)">`;
+          row.insertCell(3).innerHTML = `<input type="number" class="lateHours" value="${formattedLate}" style="width:60px;">`;
+          row.insertCell(4).innerHTML = `<input type="number" class="fineAmount" value="${formattedFine}" style="width:75px;">`;
+        });
+      });
+  }
+
+  function updateAttendanceRecord() {
+    let branch = getSelectedBranch();
+    let date = document.getElementById("editDateSelect").value;
+    let rows = document.getElementById("editAttendanceTable").getElementsByTagName('tbody')[0].rows;
+    let updatedRecords = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      let timeVal = rows[i].cells[2].querySelector('input').value;
+      let lateVal = rows[i].cells[3].querySelector('input').value;
+      let fineVal = rows[i].cells[4].querySelector('input').value;
+
+      updatedRecords.push({
+        branch, date,
+        name: rows[i].cells[0].innerText,
+        status: rows[i].cells[1].querySelector('select').value,
+        timeIn: timeVal ? timeVal : "-",
+        lateHours: lateVal ? lateVal : "0",
+        fine: fineVal ? fineVal : "0"
+      });
+    }
+
+    fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "updateAttendance", records: updatedRecords })
+    })
+    .then(res => res.text())
+    .then(() => {
+      alert("ریکارڈ کامیابی سے اپ ڈیٹ ہو گیا!");
+      document.getElementById("editArea").style.display = "none";
+    });
+  }
+
+  async function loadAttendanceReport() {
+    let selectedBranch = getSelectedBranch();
+    let reportDate = document.getElementById("reportDateSelect").value;
+    if (!reportDate) return alert("براہ کرم رپورٹ کی تاریخ منتخب کریں!");
+
+    let displayDiv = document.getElementById("recordsDisplay");
+    displayDiv.innerHTML = "<p style='color: var(--text-muted); text-align: center; padding: 20px;'><i class='fa-solid fa-spinner fa-spin'></i> Report load ho rahi hai...</p>";
+
+    try {
+      let records = await fetchWithRetry(`${WEB_APP_URL}?action=getRecord&branch=${selectedBranch}&date=${reportDate}`);
+      displayDiv.innerHTML = "";
+
+      if (!records || records.length === 0) {
+        displayDiv.innerHTML = `<p style='color: var(--text-muted); text-align: center; padding: 20px;'>${reportDate} ke liye koi record nahi mila.</p>`;
+        return;
+      }
+
+      let html = `<h4 style="margin-top:10px; margin-bottom:15px; color:#e2e8f0;"><i class="fa-solid fa-calendar-day"></i> Branch ${selectedBranch} Report (${reportDate})</h4>`;
+      html += `<div class="table-container"><table><thead><tr><th>Employee Name</th><th>Status</th><th>Time In</th><th>Late Hours</th><th>Fine (PKR)</th></tr></thead><tbody>`;
+      
+      let totalFine = 0;
+      records.forEach(r => {
+        totalFine += Number(r.fine || 0);
+        html += `<tr><td>${r.name}</td><td>${r.status}</td><td>${r.timeIn}</td><td>${r.lateHours}</td><td>${r.fine}</td></tr>`;
+      });
+      html += `</tbody></table></div>`;
+      html += `<div style="margin-top: 15px; text-align: right; font-weight: 700; color: #38bdf8;">Total Branch Fine: PKR ${totalFine}</div>`;
+      displayDiv.innerHTML = html;
+    } catch(err) {
+      displayDiv.innerHTML = `<p style='color: var(--danger); text-align: center; padding: 20px;'>Report load karne mein nakami hui.</p>`;
+    }
+  }
+
+  async function downloadCSV() {
+    let selectedBranch = getSelectedBranch();
+    let reportDate = document.getElementById("reportDateSelect").value;
+    if (!reportDate) return alert("تاریخ سلیکٹ کریں!");
+
+    try {
+      let records = await fetchWithRetry(`${WEB_APP_URL}?action=getRecord&branch=${selectedBranch}&date=${reportDate}`);
+      if (!records || records.length === 0) return alert("اس تاریخ کا کوئی ڈیٹا موجود نہیں!");
+
+      let csv = "Branch,Date,Employee Name,Status,Time In,Late Hours,Fine (PKR)\n";
+      records.forEach(r => {
+        csv += `"${selectedBranch}","${reportDate}","${r.name}","${r.status}","${r.timeIn}","${r.lateHours}","${r.fine}"\n`;
+      });
+
+      let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Attendance_${selectedBranch}_${reportDate}.csv`;
+      link.click();
+    } catch(e) {
+      alert("CSV Export failed.");
+    }
+  }
+
+  async function downloadPDF() {
+    let selectedBranch = getSelectedBranch();
+    let reportDate = document.getElementById("reportDateSelect").value;
+    if (!reportDate) return alert("تاریخ سلیکٹ کریں!");
+
+    try {
+      let records = await fetchWithRetry(`${WEB_APP_URL}?action=getRecord&branch=${selectedBranch}&date=${reportDate}`);
+      if (!records || records.length === 0) return alert("اس تاریخ کا کوئی ڈیٹا موجود نہیں!");
+
+      const { jsPDF } = window.jspdf;
+      let doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text("AL-MAJID ELECTRONICS", 14, 20);
+      
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Attendance Report - Branch ${selectedBranch} (${reportDate})`, 14, 28);
+
+      let tableData = [];
+      let totalFine = 0;
+      records.forEach(r => {
+        totalFine += Number(r.fine || 0);
+        tableData.push([r.name, r.status, r.timeIn, r.lateHours, r.fine]);
+      });
+
+      doc.autoTable({
+        startY: 35,
+        head: [['Employee Name', 'Status', 'Time In', 'Late Hours', 'Fine (PKR)']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { fillColor: [99, 102, 241] }
+      });
+
+      let finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFont("helvetica", "bold");
+      doc.text(`Total Branch Fine: PKR ${totalFine}`, 14, finalY);
+
+      doc.save(`Attendance_${selectedBranch}_${reportDate}.pdf`);
+    } catch(e) {
+      alert("PDF Export failed.");
+    }
+  }
+
+  async function printReportPreview() {
+    let selectedBranch = getSelectedBranch();
+    let reportDate = document.getElementById("reportDateSelect").value;
+    if (!reportDate) return alert("تاریخ سلیکٹ کریں!");
+
+    try {
+      let records = await fetchWithRetry(`${WEB_APP_URL}?action=getRecord&branch=${selectedBranch}&date=${reportDate}`);
+      if (!records || records.length === 0) return alert("اس تاریخ کا کوئی ڈیٹا موجود نہیں!");
+
+      let totalFine = 0;
+      let rowsHtml = "";
+      records.forEach(r => {
+        totalFine += Number(r.fine || 0);
+        rowsHtml += `<tr>
+          <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">${r.name}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">${r.status}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">${r.timeIn}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">${r.lateHours}</td>
+          <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">${r.fine}</td>
+        </tr>`;
+      });
+
+      let printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Print Preview - Al-Majid Electronics</title>
+          <style>
+            body { font-family: 'Plus Jakarta Sans', Arial, sans-serif; padding: 20px; color: #1e293b; }
+            h2 { text-align: center; margin-bottom: 5px; text-transform: uppercase; }
+            .subtitle { text-align: center; font-size: 14px; color: #64748b; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+            th { background: #6366f1; color: white; border: 1px solid #cbd5e1; padding: 10px; text-align: center; }
+            .total { margin-top: 20px; text-align: right; font-weight: bold; font-size: 16px; }
+            @media print {
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h2>AL-MAJID ELECTRONICS</h2>
+          <div class="subtitle">Attendance Report - Branch ${selectedBranch} (${reportDate})</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Name</th>
+                <th>Status</th>
+                <th>Time In</th>
+                <th>Late Hours</th>
+                <th>Fine (PKR)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+          <div class="total">Total Branch Fine: PKR ${totalFine}</div>
+          <div style="margin-top: 30px; text-align: center;" class="no-print">
+            <button onclick="window.print()" style="padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: bold;">Print Report</button>
+          </div>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    } catch(e) {
+      alert("Print Preview failed.");
+    }
+  }
+</script>
+</body>
+</html>
